@@ -4,11 +4,12 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"os"
 	"path/filepath"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func MoReport() {
@@ -31,17 +32,17 @@ func MoReport() {
 	query := fmt.Sprintf("SELECT network, mcc, mnc, cc, msisdn, flow, src_address, created_on FROM tbl_campaign_messages WHERE flow='%s' AND org_id='%d' AND DATE(created_on)='%s';", FLOW, orgID, DATE)
 
 	// Connect to the database
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", username, password, host, dbName, port))
+	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", username, password, host, port, dbName))
 	if err != nil {
 		log.Fatal("Connection failed: ", err)
 	}
 	defer db.Close()
-
 	// Execute the SQL query
 	rows, err := db.Query(query)
 	if err != nil {
 		log.Fatal("Error executing query: ", err)
 	}
+
 	defer rows.Close()
 
 	// Open the CSV file in write mode
