@@ -5,6 +5,7 @@ import (
 	"gopkg.in/gomail.v2"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // Mail sends an email with an attached file
@@ -14,10 +15,7 @@ func Mail() {
 	password := os.Getenv("PASSWORD")
 
 	// Receiver email addresses
-	to := []string{
-		"mercymaina567@gmail.com",
-		"aliphonzanderitu@gmail.com",
-	}
+	to := strings.Split(os.Getenv("EMAIL_RECIPIENTS"), ",")
 
 	// Create a new email message
 	subject := "Daily MO Report"
@@ -26,7 +24,7 @@ func Mail() {
 	// Create a new email client
 	email := gomail.NewMessage()
 	email.SetHeader("From", from)
-	email.SetHeader("to", to...)
+	email.SetHeader("To", to...)
 	email.SetHeader("Subject", subject)
 	email.SetBody("text/plain", message)
 
@@ -49,9 +47,6 @@ func Mail() {
 	}
 
 	// Attach the CSV file
-	email.Attach(latestFile)
-
-	// Create a new email client with SMTP configuration
 	email.Attach(latestFile)
 
 	// Create a new email client with SMTP configuration
