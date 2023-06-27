@@ -20,16 +20,18 @@ func MoReport() {
 	dbName := os.Getenv("DB_NAME")
 	port := os.Getenv("DB_PORT")
 	// CSV file path
-	DATE := time.DateOnly
+	// Get yesterday's date
+	yesterday := time.Now().AddDate(0, 0, -1)
+	yesterdayStr := yesterday.Format("2006-01-02")
 	outputFolder := os.Getenv("DIR") // Specify the desired folder path
-	csvFile := filepath.Join(outputFolder, DATE+".csv")
+	csvFile := filepath.Join(outputFolder, yesterdayStr+".csv")
 
 	// Generate the date string for today
 	FLOW := "MO"
 	orgID := 209
 
 	// SQL query to retrieve data created today
-	query := fmt.Sprintf("SELECT network, mcc, mnc, cc, msisdn, flow, src_address, created_on FROM tbl_campaign_messages WHERE flow='%s' AND org_id='%d' AND DATE(created_on)='%s';", FLOW, orgID, DATE)
+	query := fmt.Sprintf("SELECT network, mcc, mnc, cc, msisdn, flow, src_address, created_on FROM tbl_campaign_messages WHERE flow='%s' AND org_id='%d' AND DATE(created_on)='%s';", FLOW, orgID, yesterdayStr)
 
 	// Connect to the database
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", username, password, host, port, dbName))

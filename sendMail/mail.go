@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"gopkg.in/gomail.v2"
 )
@@ -30,62 +31,24 @@ func Mail() {
 	email.SetBody("text/plain", message)
 
 	// Find the latest CSV file in the folder
-	files, err := filepath.Glob(os.Getenv("DIR")) // Update with the correct folder path
-	if err != nil {
-		fmt.Printf("Error finding CSV files: %s\n", err)
-		return
-	}
 
-	if len(files) == 0 {
-		fmt.Println("No CSV files found in the folder.")
-		return
-	}
-
-	latestFile := getLatestFile(files)
-	if latestFile == "" {
-		fmt.Println("Unable to determine the latest CSV file.")
-		return
-	}
+	// Get yesterday's date
+	yesterday := time.Now().AddDate(0, 0, -1)
+	yesterdayStr := yesterday.Format("2006-01-02")
+	csvFile := filepath.Join(os.Getenv("DIR"), fmt.Sprintf("%s.csv", yesterdayStr))
 
 	// Attach the CSV file
-	email.Attach(latestFile)
+	email.Attach(csvFile)
 
 	// Create a new email client with SMTP configuration
 	d := gomail.NewDialer("smtp.gmail.com", 587, from, password)
 
 	// Send the email
-	err = d.DialAndSend(email)
+	err := d.DialAndSend(email)
 	if err != nil {
 		fmt.Printf("Error sending email: %s\n", err)
 		return
 	}
 
 	fmt.Println("Email Sent!")
-}
-
-// getLatestFile returns the latest file from the list of file paths
-// getLatestFile returns the latest file from the list of file paths
-func getLatestFile(files []string) string {
-	var latestTime int64
-	var latestFile string
-
-	for _, file := range files {
-		fileInfo, err := os.Stat(file)
-		if err != nil {
-			continue
-		}
-
-		// Skip directories
-		if !fileInfo.Mode().IsRegular() {
-			continue
-		}
-
-		modTime := fileInfo.ModTime().Unix()
-		if modTime > latestTime {
-			latestTime = modTime
-			latestFile = file
-		}
-	}
-
-	return latestFile
 }
