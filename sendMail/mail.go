@@ -2,10 +2,11 @@ package sendMail
 
 import (
 	"fmt"
-	"gopkg.in/gomail.v2"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"gopkg.in/gomail.v2"
 )
 
 // Mail sends an email with an attached file
@@ -63,6 +64,7 @@ func Mail() {
 }
 
 // getLatestFile returns the latest file from the list of file paths
+// getLatestFile returns the latest file from the list of file paths
 func getLatestFile(files []string) string {
 	var latestTime int64
 	var latestFile string
@@ -70,6 +72,11 @@ func getLatestFile(files []string) string {
 	for _, file := range files {
 		fileInfo, err := os.Stat(file)
 		if err != nil {
+			continue
+		}
+
+		// Skip directories
+		if !fileInfo.Mode().IsRegular() {
 			continue
 		}
 
