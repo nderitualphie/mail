@@ -29,9 +29,9 @@ func MoReport() {
 	// Generate the date string for today
 	FLOW := "MO"
 	orgID := 209
-
+	src := os.Getenv("SHORTCODE")
 	// SQL query to retrieve data created today
-	query := fmt.Sprintf("SELECT network, mcc, mnc, cc, msisdn, flow, src_address, created_on FROM tbl_campaign_messages WHERE flow='%s' AND org_id='%d' AND DATE(created_on)='%s';", FLOW, orgID, yesterdayStr)
+	query := fmt.Sprintf("SELECT network, mcc, mnc, cc, msisdn, flow, src_address, created_on FROM tbl_campaign_messages WHERE flow='%s' AND org_id='%d' AND DATE(created_on)='%s'; AND src_address = '%v'", FLOW, orgID, yesterdayStr, src)
 
 	// Connect to the database
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", username, password, host, port, dbName))
