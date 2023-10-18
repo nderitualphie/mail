@@ -54,7 +54,7 @@ func MoReport() {
 	defer file.Close()
 
 	// Write the CSV header
-	headers := []string{"Network", "Date", "src_address", "Total"} // Replace with actual column names
+	headers := []string{"Network", "src_address", "Date", "Total"} // Replace with actual column names
 	writer := csv.NewWriter(file)
 	writer.Write(headers)
 
