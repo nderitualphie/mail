@@ -27,11 +27,10 @@ func MoReport() {
 	csvFile := filepath.Join(outputFolder, yesterdayStr+".csv")
 
 	// Generate the date string for today
-	FLOW := "MO"
 	orgID := 209
-	src := os.Getenv("SHORTCODE")
+
 	// SQL query to retrieve data created today
-	query := fmt.Sprintf("SELECT network, mcc, mnc, cc, msisdn, flow, src_address, created_on FROM tbl_campaign_messages WHERE flow='%s' AND org_id='%d' AND DATE(created_on)='%s' AND src_address = '%s';", FLOW, orgID, yesterdayStr, src)
+	query := fmt.Sprintf("SELECT network,  src_address, DATE(created_on) AS DATE, count(*) AS total FROM ucm.tbl_campaign_messages WHERE flow = 'MO' AND org_id = '%v'  AND DATE(LEFT(created_on, 10)) = '%v'  and network <> 'Unknown' GROUP BY network,src_address, DATE(created_on)\nORDER BY network ASC;\n", orgID, yesterdayStr)
 
 	// Connect to the database
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", username, password, host, port, dbName))
@@ -55,19 +54,19 @@ func MoReport() {
 	defer file.Close()
 
 	// Write the CSV header
-	headers := []string{"Network", "mcc", "mnc", "cc", "msisdn", "flow", "src_address", "created_on"} // Replace with actual column names
+	headers := []string{"Network", "Date", "src_address", "Total"} // Replace with actual column names
 	writer := csv.NewWriter(file)
 	writer.Write(headers)
 
 	// Write the query results to the CSV file
 	for rows.Next() {
-		var network, mcc, mnc, cc, msisdn, flow, srcAddress, createdOn string
-		err := rows.Scan(&network, &mcc, &mnc, &cc, &msisdn, &flow, &srcAddress, &createdOn)
+		var network, srcAddress, createdOn string
+		err := rows.Scan(&network, &srcAddress, &createdOn)
 		if err != nil {
 			log.Fatal("Error scanning rows: ", err)
 		}
 
-		row := []string{network, mcc, mnc, cc, msisdn, flow, srcAddress, createdOn}
+		row := []string{network, srcAddress, createdOn}
 		writer.Write(row)
 	}
 
