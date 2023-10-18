@@ -60,13 +60,13 @@ func MoReport() {
 
 	// Write the query results to the CSV file
 	for rows.Next() {
-		var network, srcAddress, createdOn string
-		err := rows.Scan(&network, &srcAddress, &createdOn)
+		var network, srcAddress, createdOn, total string
+		err := rows.Scan(&network, &srcAddress, &createdOn, &total)
 		if err != nil {
 			log.Fatal("Error scanning rows: ", err)
 		}
 
-		row := []string{network, srcAddress, createdOn}
+		row := []string{network, srcAddress, createdOn, total}
 		writer.Write(row)
 	}
 
